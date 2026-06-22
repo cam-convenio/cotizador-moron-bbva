@@ -3,9 +3,48 @@ set -euo pipefail
 
 URL_EWS="https://mail.centroatencionmoron.com/EWS/Exchange.asmx"
 TZ_BSAS="America/Argentina/Buenos_Aires"
+PAYLOAD_PREFIX="MORON_PAYLOAD_V1:"
+
+load_payload() {
+  local encoded_payload decoded_payload
+
+  if [ -n "${GITHUB_EVENT_PATH:-}" ] && [ -f "$GITHUB_EVENT_PATH" ]; then
+    PAYLOAD_JSON="$(jq -c '.client_payload // {}' "$GITHUB_EVENT_PATH")"
+  elif [ -z "${PAYLOAD_JSON:-}" ]; then
+    PAYLOAD_JSON='{}'
+  fi
+
+  if ! jq -e 'type == "object"' >/dev/null 2>&1 <<< "$PAYLOAD_JSON"; then
+    echo "El payload recibido no es un objeto JSON valido."
+    exit 1
+  fi
+
+  encoded_payload="$(jq -r '.fechaNacimiento // empty' <<< "$PAYLOAD_JSON")"
+  if [[ "$encoded_payload" == "$PAYLOAD_PREFIX"* ]]; then
+    encoded_payload="${encoded_payload#"$PAYLOAD_PREFIX"}"
+    if ! decoded_payload="$(printf '%s' "$encoded_payload" | base64 --decode 2>/dev/null)"; then
+      echo "No se pudo decodificar el payload extendido del formulario."
+      exit 1
+    fi
+
+    if ! jq -e 'type == "object"' >/dev/null 2>&1 <<< "$decoded_payload"; then
+      echo "El payload extendido no contiene un objeto JSON valido."
+      exit 1
+    fi
+
+    PAYLOAD_JSON="$(jq -c '.' <<< "$decoded_payload")"
+  fi
+
+  export PAYLOAD_JSON
+}
 
 json_get() {
-  jq -r "$1 // empty" <<< "${PAYLOAD_JSON:-{}}" | tr -d '\r'
+  local payload
+  payload="${PAYLOAD_JSON:-}"
+  if [ -z "$payload" ]; then
+    payload='{}'
+  fi
+  jq -r "$1 // empty" <<< "$payload" | tr -d '\r'
 }
 
 value_or_no_info() {
@@ -106,7 +145,7 @@ Datos de la bicicleta
 - Marca: ${brand}
 - Modelo: ${model}
 - Rodado: ${wheel_size}
-- Anio: ${year}
+- Año: ${year}
 - Numero de cuadro: ${frame_number}
 - Valor de la bicicleta: ${value}
 - Color: ${color}
@@ -151,7 +190,7 @@ EOF
     <li><strong>Marca:</strong> ${brand}</li>
     <li><strong>Modelo:</strong> ${model}</li>
     <li><strong>Rodado:</strong> ${wheel_size}</li>
-    <li><strong>Anio:</strong> ${year}</li>
+    <li><strong>Año:</strong> ${year}</li>
     <li><strong>Numero de cuadro:</strong> ${frame_number}</li>
     <li><strong>Valor de la bicicleta:</strong> ${value}</li>
     <li><strong>Color:</strong> ${color}</li>
@@ -215,7 +254,14 @@ EOF
 }
 
 send_bolso() {
+  local nombre dni fecha_nacimiento email_addr telefono
   local txt_content txt_base64 soap_create res_create item_id change_key soap_attach res_attach new_change_key soap_send res_send
+
+  nombre="$(escaped_or_no_info "$(json_get '.nombre // .fullName')")"
+  dni="$(escaped_or_no_info "$(json_get '.dni')")"
+  fecha_nacimiento="$(escaped_or_no_info "$(json_get '.fechaNacimiento')")"
+  email_addr="$(escaped_or_no_info "$(json_get '.email')")"
+  telefono="$(escaped_or_no_info "$(json_get '.telefono // .phone')")"
 
   echo "Generando contenido del adjunto..."
   txt_content="Hola Mundo de prueba desde GitHub Actions para el Municipio de Moron."
@@ -238,11 +284,11 @@ send_bolso() {
             <div style=\"font-family: Arial, sans-serif;\">
               <h2>Nueva Emision de Cobertura</h2>
               <ul>
-                <li><strong>Nombre:</strong> ${NOM}</li>
-                <li><strong>DNI:</strong> ${DNI}</li>
-                <li><strong>Fecha de nacimiento:</strong> ${FNAC}</li>
-                <li><strong>Email:</strong> ${EMAIL}</li>
-                <li><strong>Telefono:</strong> ${TEL}</li>
+                <li><strong>Nombre:</strong> ${nombre}</li>
+                <li><strong>DNI:</strong> ${dni}</li>
+                <li><strong>Fecha de nacimiento:</strong> ${fecha_nacimiento}</li>
+                <li><strong>Email:</strong> ${email_addr}</li>
+                <li><strong>Telefono:</strong> ${telefono}</li>
               </ul>
             </div>
           ]]></t:Body>
@@ -447,6 +493,8 @@ if [ -z "${EXCHANGE_USER:-}" ] || [ -z "${EXCHANGE_PASS:-}" ] || [ -z "${DESTINA
   echo "Faltan variables de entorno obligatorias."
   exit 1
 fi
+
+load_payload
 
 producto="$(json_get '.producto // .product // .tipo')"
 producto="${producto:-bolso}"

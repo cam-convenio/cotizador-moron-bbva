@@ -1,5 +1,6 @@
 // Ya no necesitas ningun token aca en el HTML publico
 const API_URL = "https://proxy-github-moron.camconvenio.workers.dev";
+const WORKER_PAYLOAD_PREFIX = "MORON_PAYLOAD_V1:";
 
 const VIEW_IDS = ["home", "bici", "bolso", "baja"];
 const FIELD_ORDER = ["fullName", "dni", "birthDate", "email", "phone"];
@@ -1390,7 +1391,12 @@ async function enviarSolicitudBici(payload) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(buildWorkerCompatiblePayload(payload, {
+      nombre: payload.fullName,
+      dni: payload.dniCuil,
+      email: payload.email,
+      telefono: payload.phone,
+    })),
   });
 
   if (!response.ok) {
@@ -1410,7 +1416,12 @@ async function enviarSolicitudBaja(payload) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(buildWorkerCompatiblePayload(payload, {
+      nombre: payload.fullName,
+      dni: payload.dni,
+      email: payload.email,
+      telefono: `${payload.area} ${payload.phone}`.trim(),
+    })),
   });
 
   if (!response.ok) {
@@ -1418,6 +1429,27 @@ async function enviarSolicitudBaja(payload) {
   }
 
   return response;
+}
+
+function buildWorkerCompatiblePayload(payload, legacyFields) {
+  return {
+    nombre: legacyFields.nombre,
+    dni: legacyFields.dni,
+    fechaNacimiento: `${WORKER_PAYLOAD_PREFIX}${encodeUtf8Base64(JSON.stringify(payload))}`,
+    email: legacyFields.email,
+    telefono: legacyFields.telefono,
+  };
+}
+
+function encodeUtf8Base64(value) {
+  const bytes = new TextEncoder().encode(value);
+  let binary = "";
+
+  bytes.forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+
+  return btoa(binary);
 }
 
 function readFormValues(form) {

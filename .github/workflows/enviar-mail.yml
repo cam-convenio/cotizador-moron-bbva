@@ -18,10 +18,4 @@ jobs:
           EXCHANGE_USER: ${{ secrets.EXCHANGE_USER }}
           EXCHANGE_PASS: ${{ secrets.EXCHANGE_PASS }}
           DESTINATARIO_MAIL: ${{ secrets.DESTINATARIO_MAIL }}
-          PAYLOAD_JSON: ${{ toJson(github.event.client_payload) }}
-          NOM: ${{ github.event.client_payload.nombre }}
-          DNI: ${{ github.event.client_payload.dni }}
-          FNAC: ${{ github.event.client_payload.fechaNacimiento }}
-          EMAIL: ${{ github.event.client_payload.email }}
-          TEL: ${{ github.event.client_payload.telefono }}
         run: bash .github/scripts/send-ews.sh
