@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 180" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bag-purple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a78bfa" />
+      <stop offset="100%" stop-color="#6d4bdc" />
+    </linearGradient>
+    <linearGradient id="phone-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#f5f3ff" />
+    </linearGradient>
+    <linearGradient id="ap-badge" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ec4899" />
+      <stop offset="100%" stop-color="#db2777" />
+    </linearGradient>
+    <filter id="soft-shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#101828" flood-opacity="0.08" />
+    </filter>
+  </defs>
+
+  <g filter="url(#soft-shadow)">
+    <!-- Backpack (Left) -->
+    <!-- Handle -->
+    <path d="M75,45 C75,30 105,30 105,45" fill="none" stroke="#4a3780" stroke-width="5" stroke-linecap="round" />
+    <!-- Straps background shadow -->
+    <rect x="52" y="50" width="76" height="85" rx="20" fill="#3b2b63" opacity="0.15" />
+    <!-- Main Body -->
+    <rect x="55" y="45" width="70" height="90" rx="18" fill="url(#bag-purple)" stroke="#4a3780" stroke-width="4.5" />
+    <!-- Top Flap/Zip line -->
+    <path d="M55,75 L125,75" stroke="#4a3780" stroke-width="3" stroke-dasharray="4,4" />
+    <!-- Front Pocket -->
+    <rect x="65" y="85" width="50" height="40" rx="8" fill="#f5f3ff" stroke="#4a3780" stroke-width="3.5" />
+    <!-- Pocket Zip line -->
+    <line x1="65" y1="95" x2="115" y2="95" stroke="#4a3780" stroke-width="2.5" />
+    <!-- Small label on pocket -->
+    <rect x="85" y="105" width="10" height="6" rx="1" fill="#6d4bdc" />
+
+    <!-- Smartphone (Right, overlapping backpack slightly) -->
+    <!-- Phone Body -->
+    <rect x="140" y="65" width="45" height="75" rx="8" fill="#1f2937" stroke="#4b5563" stroke-width="3" />
+    <!-- Phone Screen -->
+    <rect x="143" y="69" width="39" height="67" rx="5" fill="url(#phone-grad)" />
+    <!-- Speaker/Camera Notch -->
+    <rect x="157" y="69" width="11" height="3" rx="1.5" fill="#1f2937" />
+    <!-- App Mockup UI inside screen -->
+    <circle cx="162.5" cy="85" r="8" fill="#6d4bdc" opacity="0.8" />
+    <rect x="148" y="98" width="29" height="4" rx="2" fill="#e4e4e7" />
+    <rect x="148" y="106" width="29" height="4" rx="2" fill="#e4e4e7" />
+    <rect x="148" y="114" width="20" height="4" rx="2" fill="#cbd5e1" />
+
+    <!-- AP Badge (Floating bottom right) -->
+    <g transform="translate(170, 115)">
+      <rect x="0" y="0" width="28" height="18" rx="4" fill="url(#ap-badge)" stroke="#ffffff" stroke-width="1.5" />
+      <text x="14" y="12" fill="#ffffff" font-family="Segoe UI, Arial, sans-serif" font-weight="900" font-size="9" text-anchor="middle">AP</text>
+    </g>
+  </g>
+</svg>
