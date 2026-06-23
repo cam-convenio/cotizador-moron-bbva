@@ -1230,7 +1230,8 @@ form {
   grid-column: 1 / -1;
 }
 
-.form-grid--bici {
+.form-grid--bici,
+.form-grid--bolso {
   display: grid;
   gap: var(--space-3);
 }
@@ -1372,7 +1373,8 @@ form {
 }
 
 @media (min-width: 760px) {
-  .form-grid--bici {
+  .form-grid--bici,
+  .form-grid--bolso {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
