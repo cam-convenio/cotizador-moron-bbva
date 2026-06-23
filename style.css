@@ -1092,7 +1092,7 @@ form {
   object-fit: contain;
 }
 
-@media (min-width: 760px) {
+@media (min-width: 640px) {
   .app-header {
     flex-direction: row;
     align-items: center;
@@ -1128,16 +1128,6 @@ form {
   }
 
   .field--full {
-    grid-column: 1 / -1;
-  }
-
-  .panel--form form {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .panel--form .field,
-  .panel--form .form-feedback,
-  .panel--form .primary-action {
     grid-column: 1 / -1;
   }
 
@@ -1372,7 +1362,7 @@ form {
   text-align: center;
 }
 
-@media (min-width: 760px) {
+@media (min-width: 640px) {
   .form-grid--bici,
   .form-grid--bolso {
     grid-template-columns: repeat(2, minmax(0, 1fr));
